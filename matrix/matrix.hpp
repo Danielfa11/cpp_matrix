@@ -6,13 +6,13 @@
 template <typename T>
 class Matrix {
     
-    std::vector<std::vector<T>> matrix;
+    std::vector<std::vector<T>> matrix_;
     int row_len = 0;
     int col_len = 0;
 
     public:
     Matrix(int const &rows, int const &cols){
-        matrix.resize(rows, std::vector<T>(cols));
+        matrix_.resize(rows, std::vector<T>(cols));
         row_len = rows;
         col_len = cols;
     };
@@ -22,13 +22,13 @@ class Matrix {
             throw std::runtime_error("vector must have same size as col * rows");
         }
 
-        matrix.resize(rows, std::vector<T>(cols));
+        matrix_.resize(rows, std::vector<T>(cols));
         row_len = rows;
         col_len = cols;
 
         for(int i = 0; i< rows; i++){
             for(int ii = 0; ii < cols; ii++){
-                matrix[i][ii] = vec[i * cols + ii];
+                matrix_[i][ii] = vec[i * cols + ii];
             }
         }
     };
@@ -40,7 +40,7 @@ class Matrix {
     void const print(){
         for(int i =0; i< row_len;i++){
             for(int ii = 0;ii< col_len;ii++){
-                std::cout << matrix[i][ii] << " ";
+                std::cout << matrix_[i][ii] << " ";
             }
             std::cout << "\n";
         }
@@ -54,18 +54,19 @@ class Matrix {
         if(col > col_len){
             throw std::runtime_error("matrixs out of bounds col");
         }
-        return matrix[row][col];
+        return matrix_[row][col];
     }
 
     const T& at(int row, int col) const {
-        return matrix.at(row).at(col);
+        return matrix_.at(row).at(col);
     }
 
-
+    // TODO
     void insertRow(std::vector<T> newRow){};
-
+    // TODO
     void insertColumn(std::vector<T> newCol){};
 
+    // TODO
     void remove(){};
 
     void addInPlace(Matrix<T> const &lhs){
@@ -75,7 +76,7 @@ class Matrix {
         }
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                matrix[i][ii] += lhs.at(i,ii);
+                matrix_[i][ii] += lhs.at(i,ii);
             }
         }
         
@@ -103,30 +104,54 @@ class Matrix {
         }
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                matrix[i][ii] -= lhs.at(i,ii);
+                matrix_[i][ii] -= lhs.at(i,ii);
             }
         }
     };
 
+    // todo operator
     void ScalarMultiplication(const int &lhs){
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                matrix[i][ii] *= lhs;
-            }
-        }
-    };
-    void ScalarMultiplication(const double lhs){
-         for(int i = 0; i < row_len; i++){
-            for(int ii = 0; ii < col_len; ii++){
-                matrix[i][ii] *= lhs;
+                this->at(i,ii) *= lhs;
             }
         }
     };
 
+    // todo operator
+    void ScalarMultiplication(const double lhs){
+         for(int i = 0; i < row_len; i++){
+            for(int ii = 0; ii < col_len; ii++){
+                this->at(i,ii) *= lhs;
+            }
+        }
+    };
+
+    // TODO
     void Transpose(){};
     
     Matrix<T> inverse(){};
-    Matrix<T> MatrixMultiple(Matrix<T> const  &lhs){};
+
+    
+
+    Matrix<T> Multiply(Matrix<T> const  &lhs){{
+        auto lhs_pair = lhs.size();
+        if (col_len != lhs_pair.first){
+            throw std::runtime_error("Matrics being muiltiplty must have martix1.cols.len = martix2.rows.lens");
+        }
+        Matrix<T> result(row_len,lhs_pair.second);
+       for(int m1_row = 0; m1_row < row_len;m1_row++){
+        for(int m2_col = 0; m2_col < lhs_pair.second; m2_col++){
+            T sum = 0;
+            for(int m1_col = 0; m1_col< col_len; m1_col++){
+                sum += this->at(m1_row,m1_col) * lhs.at(m1_col,m2_col);
+            }
+            result.at(m1_row,m2_col) = sum;
+        }
+    }
+    return result;
+
+    }};
 
 
     void operator+=(const Matrix<T> &lhs){
@@ -135,5 +160,13 @@ class Matrix {
 
     Matrix<T> operator+(const Matrix<T> &lhs){
         return this->add(lhs);
+    }
+    
+    Matrix<T> operator*(const Matrix<T> &lhs){
+        return this->Multiply(lhs);
+    }
+    // TODO
+     void operator*=(const Matrix<T> &lhs){
+        
     }
 };
