@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <cmath>
 
-const float EPSOLON_ = 0.000001;
 template <typename T>
 class Matrix {
     
@@ -12,9 +11,9 @@ class Matrix {
     int row_len = 0;
     int col_len = 0;
 
-    void checkSize(std::pair<int,int> &rhs_pair) const {
+    void checkSize(std::pair<int,int> rhs_pair) const {
         if(rhs_pair.first!= row_len || rhs_pair.second != col_len) {
-            throw std::runtime_error("matrixs must be of same size");
+            throw std::runtime_error("Matrixs must be of same size in checkSize");
         }
     }
 
@@ -42,10 +41,28 @@ class Matrix {
         }
     };
 
+    /*
+    get the size of the matrix nxm
+
+    current method to access the values is:
+    row_len = size.first
+    col_len = size.second
+
+    return type: std::pair<int,int>
+    */
     std::pair<int,int> size() const{
         return std::make_pair(row_len,col_len);
     }
 
+    /*
+    Print the current matrix
+    fromate is:
+    1 2 3
+    4 5 6
+    7 8 9
+
+    return type: void
+    */
     void const print(){
         for(int i =0; i< row_len;i++){
             for(int ii = 0;ii< col_len;ii++){
@@ -54,12 +71,12 @@ class Matrix {
             std::cout << "\n";
         }
     }
-    // Optional: to access or modify elements
+    
     T& at(int row, int col) {
        if (row < 0 || row >= row_len || col < 0 || col >= col_len) {
             throw std::out_of_range("Matrix index out of bounds");
         }
-        return matrix_[row][col];
+        return matrix_.at(row).at(col);
     }
 
     const T& at(int row, int col) const {
@@ -77,10 +94,17 @@ class Matrix {
     // TODO
     void remove(){};
 
+    /*
+    compairs the matrixs element wise where differance bewteen 
+    value must be with in 0.000001
+
+    return type:bool
+    */
     bool isEqual(Matrix<T> const rhs) const{
         auto rhs_pair = rhs.size();
         if (rhs_pair.first != row_len || rhs_pair.second != col_len) return false;
 
+        const float EPSOLON_ = 0.000001;
         for (int i = 0;i < row_len; i++ ){
             for(int ii = 0; ii < col_len; ii++){
                 if (std::fabs(this->at(i,ii) - rhs.at(i,ii)) >= EPSOLON_) return false;
@@ -89,18 +113,61 @@ class Matrix {
         return true;
     }
     // properties
+
+    /*
+    if true is rows.lenght == cols.length
+
+    return type: bool
+    */
     bool isSquare() const {
         return row_len == col_len;
     }
     
+    /*
+    compairs the matrixs to its transpoed matrix 
+    the equal comparison is true is all elements are within 0.000001 of each other 
+    A = A^T is true
+    A != A^T false
+
+    return type: bool
+    */
     bool isSymmetric() const {
         return this->isEqual(this->Transpose());
     }
     
+    /*
+    get the trace of a square matrix tr(A)
+
+    When the matrix is not square throws error
+
+    return type: T
+    */
+    T trace() const {
+        if(!this->isSquare()){
+            throw std::runtime_error("Matrix row and cols must be of same size");
+        }
+
+        T sum = 0;
+        for(int i = 0; i < row_len;i++){
+            sum+= this->at(i,i);
+        }
+        return sum;
+    };
+
     T determinant() const {
+        if(!isSquare()) {
+            throw std::runtime_error("Matrix is not square and is rows: " + row_len +" and cols: "+ col_len);
+        }
+
         
     }
     // Artithmetic 
+
+    /*
+    Adds the inputs matrix to the current one values
+
+    return type:void 
+    */
     void addInPlace(Matrix<T> const &rhs){
         checkSize(rhs.size());
         for(int i = 0; i < row_len; i++){
@@ -161,7 +228,9 @@ class Matrix {
 
     Matrix<T> Multiply(Matrix<T> const  &rhs) const{
         auto rhs_pair = rhs.size();
-        checkSize(rhs_pair);
+        if (rhs_pair.first != col_len){
+            throw std::runtime_error("Must have the same row and column length");
+        }
 
         Matrix<T> result(row_len,rhs_pair.second);
        for(int m1_row = 0; m1_row < row_len;m1_row++){
@@ -185,7 +254,15 @@ class Matrix {
             }
         }
     }
-     // TODO
+     
+    // Transform
+
+    /*
+    Transpose the matrixs following general method of
+    A^T
+
+    return type: Matrix<T>
+    */
     Matrix<T> Transpose() const{
         Matrix<T> result(col_len, row_len);
         for (int i = 0; i < row_len; ++i) {
@@ -196,11 +273,53 @@ class Matrix {
         return result;
     };
     
-    
     Matrix<T> inverse(){};
+    /*
+    rowStart: 0 indexed 
+    rowEnd: exclusive end i.e last idx+1  
+    colStart: 0 indexed
+    colEnd: exclusive end i.e last idx+1
 
+    return type: Matrix<T>
+    */
+    Matrix<T> subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) const{
+        
+        if(rowStart < 0 || rowEnd > row_len || colStart < 0 || colEnd > col_len ||  rowStart >= rowEnd || colStart >= colEnd){
+            throw std::out_of_range("Matrix index out of bounds in subMatrix");
+        }
+        Matrix<T> result(rowEnd-rowStart, colEnd - colStart);
 
-    // arithmetic overloads
+        for(int i = rowStart; i < rowEnd; i++){
+            for(int ii = colStart; ii< colEnd; ii++){
+                result.at(i-rowStart,ii-colStart) = this->at(i,ii);
+            }
+        }
+        return result;
+    }
+    
+    Matrix<T> apply(std::function<T(T)> func) const {
+        Matrix<T> result(row_len, col_len);
+        for (int i = 0; i < row_len; i++) {
+            for (int j = 0; j < col_len; j++) {
+                result.at(i,j) = func(this->at(i,j));
+            }
+        }
+        return result;
+    }
+    
+    void broadcastAddRows(const Matrix<T>& bias_row) {
+        
+        auto bias_pair = bias_row.size();
+        if (bias_pair.first != 1 || bias_pair.second != col_len)
+            throw std::runtime_error("Bias row must be shape 1×cols of matrix");
+
+        for (int i = 0; i < row_len; ++i) {
+            for (int ii = 0; ii < col_len; ++ii) {
+                this->at(i,ii) += bias_row.at(0,ii);
+            }
+        }
+}
+    // arithmetic overloads operators
     void operator+=(const Matrix<T> &rhs){
         this->addInPlace(rhs);
     }
@@ -232,6 +351,7 @@ class Matrix {
     }
 
     // utility operatores
+
     bool operator==(const Matrix<T> &rhs) const {
         return this->isEqual(rhs);
     }
@@ -244,20 +364,17 @@ class Matrix {
 
 T determinant() const
 
-T trace() const
-
 int rank() const
 
 bool isSingular() const
 
 // transformation
-Matrix<T> transposed() const
 
 Matrix<T> inverse() const
 
-Matrix<T> subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) const
 
-Matrix<T> minorMatrix(int row, int col) const  // used for determinant/cofactor
+
+  // used for determinant/cofactor
 
 Matrix<T> adjugate() const
 
