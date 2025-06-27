@@ -1,0 +1,49 @@
+/*
+
+// PROPERTIES
+
+T determinant() const
+
+int rank() const
+
+bool isSingular() const
+
+// transformation
+
+Matrix<T> inverse() const
+
+
+
+  // used for determinant/cofactor
+
+Matrix<T> adjugate() const
+
+// Decompositions
+std::pair<Matrix<T>, Matrix<T>> luDecompose() const
+
+std::pair<Matrix<T>, Matrix<T>> qrDecompose() const
+
+std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> svd() const
+
+std::pair<Matrix<T>, Matrix<T>> choleskyDecompose() const  // for symmetric positive definite
+
+Matrix<T> eigenValues() const  // (for diagonalizable matrices)
+
+Matrix<T> eigenVectors() const
+
+// solve linear system
+Matrix<T> solve(const Matrix<T>& b) const  // Solve Ax = b
+
+Matrix<T> backSubstitute() const  // For upper triangular matrices
+
+Matrix<T> forwardSubstitute() const
+
+// norm and measures
+T normL1() const     // sum of absolute values
+
+T normL2() const     // Euclidean norm
+
+T normInf() const    // max row sum
+
+T frobeniusNorm() const
+*/
