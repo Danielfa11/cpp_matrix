@@ -1,2 +1,9 @@
 *.out
 .vscode/*
+
+CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+MODELS_LIB
