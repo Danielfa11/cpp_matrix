@@ -6,8 +6,10 @@ To run will need have `cmake` install with at least version 3.10
 To Run:
   - from the parent dir run `cmake --build .`
 
-  - for the unitTest run the `unitTest` exacutable in `./bin/`: `./unitTest` `unitTest`
-  - for the running main do run the `MODELS_LIB` in `./bin/` :`./MODELS_LIB`
+  - for the unitTest run the `unitTest` exacutable in `./bin/`
+    - `./bin/unitTest` or `./unitTest` when in bin 
+  - for the running main do run the `MODELS_LIB` in `./bin/`
+    - `./bin/MODELS_LIB` or `./MODELS_LIB` when in bin
 
 
 
