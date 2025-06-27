@@ -2,7 +2,9 @@
 #include <iostream>
 #include <utility>
 #include <stdexcept>
+#include <cmath>
 
+const float EPSOLON_ = 0.000001;
 template <typename T>
 class Matrix {
     
@@ -10,6 +12,13 @@ class Matrix {
     int row_len = 0;
     int col_len = 0;
 
+    void checkSize(std::pair<int,int> &rhs_pair) const {
+        if(rhs_pair.first!= row_len || rhs_pair.second != col_len) {
+            throw std::runtime_error("matrixs must be of same size");
+        }
+    }
+
+    
     public:
     Matrix(int const &rows, int const &cols){
         matrix_.resize(rows, std::vector<T>(cols));
@@ -47,17 +56,16 @@ class Matrix {
     }
     // Optional: to access or modify elements
     T& at(int row, int col) {
-        if(row > row_len ){
-            throw std::runtime_error("matrixs out of bounds row");
-        }
-
-        if(col > col_len){
-            throw std::runtime_error("matrixs out of bounds col");
+       if (row < 0 || row >= row_len || col < 0 || col >= col_len) {
+            throw std::out_of_range("Matrix index out of bounds");
         }
         return matrix_[row][col];
     }
 
     const T& at(int row, int col) const {
+        if (row < 0 || row >= row_len || col < 0 || col >= col_len) {
+            throw std::out_of_range("Matrix index out of bounds");
+        }
         return matrix_.at(row).at(col);
     }
 
@@ -69,104 +77,216 @@ class Matrix {
     // TODO
     void remove(){};
 
-    void addInPlace(Matrix<T> const &lhs){
-        auto lhs_pair = lhs.size();
-        if(lhs_pair.first != row_len || lhs_pair.second != col_len) {
-            throw std::runtime_error("matrixs must be of same size");
+    bool isEqual(Matrix<T> const rhs) const{
+        auto rhs_pair = rhs.size();
+        if (rhs_pair.first != row_len || rhs_pair.second != col_len) return false;
+
+        for (int i = 0;i < row_len; i++ ){
+            for(int ii = 0; ii < col_len; ii++){
+                if (std::fabs(this->at(i,ii) - rhs.at(i,ii)) >= EPSOLON_) return false;
+            }
         }
+        return true;
+    }
+    // properties
+    bool isSquare() const {
+        return row_len == col_len;
+    }
+    
+    bool isSymmetric() const {
+        return this->isEqual(this->Transpose());
+    }
+    
+    T determinant() const {
+        
+    }
+    // Artithmetic 
+    void addInPlace(Matrix<T> const &rhs){
+        checkSize(rhs.size());
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                matrix_[i][ii] += lhs.at(i,ii);
+                matrix_[i][ii] += rhs.at(i,ii);
             }
         }
         
     };
 
-    Matrix<T> add(Matrix<T> const &lhs){
-        auto lhs_pair = lhs.size();
-        if(lhs_pair.first != row_len || lhs_pair.second != col_len) {
-            throw std::runtime_error("matrixs must be of same size");
+    void subtractionInPlace(Matrix<T> const &rhs){
+        checkSize(rhs.size());
+        for(int i = 0; i < row_len; i++){
+            for(int ii = 0; ii < col_len; ii++){
+                matrix_[i][ii] -= rhs.at(i,ii);
+            }
         }
+    };
+  
+    void ScalarMultiplicationInPlace(const T &lhs){
+        for(int i = 0; i < row_len; i++){
+            for(int ii = 0; ii < col_len; ii++){
+                this->at(i,ii) *= lhs;
+            }
+        }
+    };
 
+    Matrix<T> add(Matrix<T> const &rhs) const{
+        checkSize(rhs.size());
         Matrix<T> result(row_len,col_len);
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                result.at(i,ii) = this->at(i,ii) + lhs.at(i,ii);
+                result.at(i,ii) = this->at(i,ii) + rhs.at(i,ii);
             }
         }
         return result;
     }
 
-    void subtractionInPlace(Matrix<T> const &lhs){
-        auto lhs_pair = lhs.size();
-        if(lhs_pair.first != row_len || lhs_pair.second != col_len) {
-            throw std::runtime_error("matrixs must be of same size");
-        }
+    Matrix<T> subtract(Matrix<T> const &rhs) const{
+        checkSize(rhs.size());
+        Matrix<T> result(row_len,col_len);
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                matrix_[i][ii] -= lhs.at(i,ii);
+                result.at(i,ii) =this->at(i,ii) - rhs.at(i,ii);
             }
         }
-    };
+    }
 
-    // todo operator
-    void ScalarMultiplication(const int &lhs){
+    Matrix<T> ScalarMultiplication(const T &rhs) const{
+        Matrix<T> result(row_len,col_len);
         for(int i = 0; i < row_len; i++){
             for(int ii = 0; ii < col_len; ii++){
-                this->at(i,ii) *= lhs;
+                result.at(i,ii) = this->at(i,ii) * rhs;
             }
         }
-    };
+        return result;
+    }
 
-    // todo operator
-    void ScalarMultiplication(const double lhs){
-         for(int i = 0; i < row_len; i++){
-            for(int ii = 0; ii < col_len; ii++){
-                this->at(i,ii) *= lhs;
-            }
-        }
-    };
+    Matrix<T> Multiply(Matrix<T> const  &rhs) const{
+        auto rhs_pair = rhs.size();
+        checkSize(rhs_pair);
 
-    // TODO
-    void Transpose(){};
-    
-    Matrix<T> inverse(){};
-
-    
-
-    Matrix<T> Multiply(Matrix<T> const  &lhs){{
-        auto lhs_pair = lhs.size();
-        if (col_len != lhs_pair.first){
-            throw std::runtime_error("Matrics being muiltiplty must have martix1.cols.len = martix2.rows.lens");
-        }
-        Matrix<T> result(row_len,lhs_pair.second);
+        Matrix<T> result(row_len,rhs_pair.second);
        for(int m1_row = 0; m1_row < row_len;m1_row++){
-        for(int m2_col = 0; m2_col < lhs_pair.second; m2_col++){
+        for(int m2_col = 0; m2_col < rhs_pair.second; m2_col++){
             T sum = 0;
             for(int m1_col = 0; m1_col< col_len; m1_col++){
-                sum += this->at(m1_row,m1_col) * lhs.at(m1_col,m2_col);
+                sum += this->at(m1_row,m1_col) * rhs.at(m1_col,m2_col);
             }
             result.at(m1_row,m2_col) = sum;
         }
     }
     return result;
+    };
 
-    }};
+    Matrix<T> hadamardProduct(const Matrix<T>& rhs) const {
+        checkSize(rhs.size());
+        Matrix<T> result(row_len,col_len);
+        for(int i = 0; i < row_len; i++){
+            for(int ii = 0; ii < col_len; ii++){
+                result.at(i,ii) =this->at(i,ii) * rhs.at(i,ii);
+            }
+        }
+    }
+     // TODO
+    Matrix<T> Transpose() const{
+        Matrix<T> result(col_len, row_len);
+        for (int i = 0; i < row_len; ++i) {
+            for (int j = 0; j < col_len; ++j) {
+                result.at(j, i) = this->at(i, j);
+            }
+        }
+        return result;
+    };
+    
+    
+    Matrix<T> inverse(){};
 
 
-    void operator+=(const Matrix<T> &lhs){
-        this->addInPlace(lhs);
+    // arithmetic overloads
+    void operator+=(const Matrix<T> &rhs){
+        this->addInPlace(rhs);
     }
 
-    Matrix<T> operator+(const Matrix<T> &lhs){
-        return this->add(lhs);
+    template<typename Scalar>
+    void operator*=(const Scalar &rhs){
+        this->ScalarMultiplicationInPlace(rhs);
     }
     
-    Matrix<T> operator*(const Matrix<T> &lhs){
-        return this->Multiply(lhs);
-    }
-    // TODO
-     void operator*=(const Matrix<T> &lhs){
+     void operator*=(const Matrix<T> &rhs){
         
     }
+
+    Matrix<T> operator+(const Matrix<T> &rhs) const{
+        return this->add(rhs);
+    }
+    
+    Matrix<T> operator-(const Matrix<T> &rhs) const{
+        return this->subtract(rhs);
+    }
+    
+    Matrix<T> operator*(const Matrix<T> &rhs) const{
+        return this->Multiply(rhs);
+    }
+
+    template<typename Scalar>
+    Matrix<T> operator*(const Scalar &rhs) const{
+        return this->ScalarMultiplication(rhs);
+    }
+
+    // utility operatores
+    bool operator==(const Matrix<T> &rhs) const {
+        return this->isEqual(rhs);
+    }
 };
+
+
+/*
+
+// PROPERTIES
+
+T determinant() const
+
+T trace() const
+
+int rank() const
+
+bool isSingular() const
+
+// transformation
+Matrix<T> transposed() const
+
+Matrix<T> inverse() const
+
+Matrix<T> subMatrix(int rowStart, int rowEnd, int colStart, int colEnd) const
+
+Matrix<T> minorMatrix(int row, int col) const  // used for determinant/cofactor
+
+Matrix<T> adjugate() const
+
+// Decompositions
+std::pair<Matrix<T>, Matrix<T>> luDecompose() const
+
+std::pair<Matrix<T>, Matrix<T>> qrDecompose() const
+
+std::tuple<Matrix<T>, Matrix<T>, Matrix<T>> svd() const
+
+std::pair<Matrix<T>, Matrix<T>> choleskyDecompose() const  // for symmetric positive definite
+
+Matrix<T> eigenValues() const  // (for diagonalizable matrices)
+
+Matrix<T> eigenVectors() const
+
+// solve linear system
+Matrix<T> solve(const Matrix<T>& b) const  // Solve Ax = b
+
+Matrix<T> backSubstitute() const  // For upper triangular matrices
+
+Matrix<T> forwardSubstitute() const
+
+// norm and measures
+T normL1() const     // sum of absolute values
+
+T normL2() const     // Euclidean norm
+
+T normInf() const    // max row sum
+
+T frobeniusNorm() const
+*/
