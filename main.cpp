@@ -6,42 +6,59 @@
 
 using namespace MatrixOperations;
 
+double sigmoid(double x) {
+    return 1.0 / (1.0 + std::exp(-x));
+}
+
+
 int main() {
-    Matrix<double> mat({1.0, 2.0, 3.0, 4.0}, 2, 2);
+       
+   Matrix<double> input({0.4, 0.3, 0.9}, 1, 3);
 
-    // isSquareMatrix
-    std::cout << "isSquare: " << isSquareMatrix(mat) << "\n";  // should be 1
+    Matrix<double> weights1({0.2, 0.8,
+                            0.4, 0.5,
+                            0.1, 0.6}, 3, 2);
+    Matrix<double> bias1({0.1, 0.2}, 1, 2);
 
-    // getTrace
-    std::cout << "Trace: " << getTrace(mat) << "\n";           // should be 5.0
+    Matrix<double> weights2({0.3,
+                            0.7}, 2, 1);
+    Matrix<double> bias2({0.1}, 1, 1);
 
-    // getTranspose
-    Matrix<double> trans = getTranspose(mat);
-    std::cout << "Transpose:\n";
-    trans.print();                                             // [[1,3],[2,4]]
+    // Forward pass
+    Matrix<double> z1 = (input * weights1) + bias1;
+    Matrix<double> a1 = apply(z1,sigmoid);
 
-    // isSymmetric
-    Matrix<double> sym({1.0, 2.0, 2.0, 1.0}, 2, 2);
-    std::cout << "isSymmetric: " << isSymmetric(sym) << "\n";  // should be 1
+    Matrix<double> z2 = a1 * weights2 + bias2;
+    Matrix<double> output = apply(z2,sigmoid);
 
-    // getSubMatrix
-    Matrix<double> mat3x3({
-        1, 2, 3,
-        4, 5, 6,
-        7, 8, 9
-    }, 3, 3);
-    Matrix<double> sub = getSubMatrix(mat3x3, 0, 2, 1, 3);     // [[2,3],[5,6]]
-    std::cout << "Submatrix:\n";
-    sub.print();
 
-    // apply (e.g. sigmoid)
-    auto sigmoid = [](double x) {
-        return 1.0 / (1.0 + std::exp(-x));
-    };
-    Matrix<double> activated = apply(mat3x3, sigmoid);
-    std::cout << "Sigmoid applied:\n";
-    activated.print();
+    // backward pass
+    // double y = 1.0;  // your target
 
-    return 0;
+    // // Grab the scalar output value
+    // double y_hat = output.at(0, 0);  
+
+    // // Compute dz2 = y_hat - y
+    // Matrix<double> dz2({y_hat - y}, 1, 1);
+    
+    // === STEP 2: Compute dw2 and db2 ===
+    // Matrix<double> a1_T = getTranspose(a1);  // shape (2×1)
+    // Matrix<double> dw2 = a1_T * dz2;                           // shape (2×1)
+    // Matrix<double> db2 = dz2;   
+    
+    // Matrix<double> da1 = dz2 * getTranspose(weights2);
+
+    // Matrix<double> dz1 = da1 * apply(z1,sigmoid);
+
+    // Matrix<double> dw1 = getTranspose(input) * dz1;
+
+    // Matrix<double> db1 = dz1;
+
+    // double learning_rate = 0.1;
+    // weights1 = (weights1 - dw1) * learning_rate;
+    // bias1    = (bias1 - db1) * learning_rate;
+    // weights2 = (weights2 - dw2) * learning_rate;
+    // bias2    = (bias2 - db2) * learning_rate;
+return 0;
 }
 

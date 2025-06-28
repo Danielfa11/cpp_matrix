@@ -15,15 +15,15 @@ namespace MatrixOperations {
     */
    template <typename T>
     T getTrace(Matrix<T> &matrix) {
-    Shape shape = matrix.getShape(); 
-    if(!isSquareMatrix(matrix)){
-        throw std::runtime_error("Matrix row and cols must be of same size");
-    }
-    T sum = 0;
-    for(int i = 0; i < shape.rows;i++){
-        sum+= matrix.at(i,i);
-    }
-    return sum;
+        Shape shape = matrix.getShape(); 
+        if(!isSquareMatrix(matrix)){
+            throw std::runtime_error("Matrix row and cols must be of same size");
+        }
+        T sum = 0;
+        for(int i = 0; i < shape.rows;i++){
+            sum+= matrix.at(i,i);
+        }
+        return sum;
     };
 
     
@@ -34,13 +34,13 @@ namespace MatrixOperations {
     template <typename T>
     Matrix<T> getTranspose(Matrix<T> const &matrix) {
         Shape shape = matrix.getShape();
-        Matrix<T> result(shape.cols, shape.rows);
+        std::vector<T> flat_mat(shape.rows * shape.cols);
         for (int i = 0; i < shape.rows; ++i) {
-            for (int j = 0; j < shape.cols; ++j) {
-                result.at(j, i) = matrix.at(i, j);
+            for (int ii = 0; ii < shape.cols; ++ii) {
+                flat_mat[ii * shape.rows + i] = matrix.at(i,ii);  
             }
         }
-        return result;
+        return Matrix<T> (flat_mat,shape.cols,shape.rows);
     };
 
       /*
@@ -67,36 +67,135 @@ namespace MatrixOperations {
         if(rowStart < 0 || rowEnd > shape.rows || colStart < 0 || colEnd > shape.cols ||  rowStart >= rowEnd || colStart >= colEnd){
             throw std::out_of_range("Matrix index out of bounds in subMatrix");
         }
-        Matrix<T> result(rowEnd-rowStart, colEnd - colStart);
-
+        int rows =(rowEnd-rowStart);
+        int cols = (colEnd - colStart);
+        std::vector<T> flat_mat(rows * cols);
+        
         for(int i = rowStart; i < rowEnd; i++){
             for(int ii = colStart; ii< colEnd; ii++){
-                result.at(i-rowStart,ii-colStart) = matrix.at(i,ii);
+                flat_mat[(i-rowStart) * cols + (ii-colStart)] = matrix.at(i,ii);
             }
         }
-        return result;
+        return Matrix<T>(flat_mat,rows,cols);
     };
-        template <typename T, typename UnaryFunction>
-        Matrix<T> apply(Matrix<T> matrix,UnaryFunction func) {
-        auto shape = matrix.getShape();
-        Matrix<T> result(shape.rows, shape.cols);
+
+    template <typename T, typename UnaryFunction>
+    Matrix<T> apply(Matrix<T> matrix,UnaryFunction func) {
+        Shape shape = matrix.getShape();
+        // Matrix<T> result(shape.rows, shape.cols);
+        std::vector<T> flat_mat(shape.rows * shape.cols);
         for (int i = 0; i < shape.rows; i++) {
-            for (int j = 0; j < shape.cols; j++) {
-                result.at(i,j) = func(matrix.at(i,j));
+            for (int ii = 0; ii < shape.cols; ii++) {
+                flat_mat[i * shape.cols + ii] = func(matrix.at(i,ii));
             }
         }
-        return result;
+        return Matrix<T>(flat_mat,shape.rows,shape.cols);
     };
 
     template<typename T>
     Matrix<T> hadamardProduct(const Matrix<T> &lhs,const Matrix<T> &rhs) {
         lhs.checkShapeMatch(rhs);
         Shape shape =lhs.getShape();
-        Matrix<T> result(shape.rows,shape.cols);
+        std::vector<T> flat_mat(shape.rows * shape.cols);
+
         for(int i = 0; i < shape.rows; i++){
             for(int ii = 0; ii < shape.cols; ii++){
-                result.at(i,ii) = lhs.at(i,ii) * rhs.at(i,ii);
+                flat_mat[i * shape.cols + ii] = lhs.at(i,ii) * rhs.at(i,ii);
             }
         }
+        return Matrix<T>(flat_mat,shape.rows,shape.cols);
+    };
+
+    template<typename T>
+    Matrix<T> add(Matrix<T>const &lhs ,Matrix<T> const &rhs) {
+        lhs.checkShapeMatch(rhs);
+        Shape shape = lhs.getShape();
+        std::vector<T> flat_mat(shape.rows * shape.cols);
+
+        for(int i = 0; i < shape.rows; i++){
+            for(int ii = 0; ii < shape.cols; ii++){
+                flat_mat[i * shape.cols + ii] = lhs.at(i,ii) + rhs.at(i,ii);
+            }
+        }
+        return Matrix<T>(flat_mat,shape.rows,shape.cols);
+    };
+    template<typename T>
+       Matrix<T> operator+(const Matrix<T> &lhs,const Matrix<T> &rhs) {
+        return add(lhs,rhs);
+    }
+
+    template<typename T>
+    Matrix<T> subtract(Matrix<T> const &lhs,Matrix<T> const &rhs) {
+        lhs.checkShapeMatch(rhs);
+        Shape shape = lhs.getShape();
+        std::vector<T> flat_mat(shape.rows * shape.cols);
+        
+        for(int i = 0; i < shape.rows; i++){
+            for(int ii = 0; ii < shape.cols; ii++){
+                 flat_mat[i * shape.cols + ii] = lhs.at(i,ii) - rhs.at(i,ii);
+            }
+        }
+        return Matrix<T>(flat_mat,shape.rows,shape.cols);
+    };
+    template<typename T>
+     Matrix<T> operator-(const Matrix<T> &lhs,const Matrix<T> &rhs){
+        return subtract(lhs,rhs);
+    }
+
+    /*
+    apply scalar multiplication matrix * value
+    see: https://en.wikipedia.org/wiki/Scalar_multiplication
+    */
+   template<typename T, typename Scalar>
+    Matrix<T> scalarMultiply(Matrix<T> const &lhs,const Scalar &rhs) {
+        Shape shape = lhs.getShape();
+        std::vector<T> flat_mat(shape.rows * shape.cols);
+
+        for(int i = 0; i < shape.rows; i++){
+            for(int ii = 0; ii < shape.cols; ii++){
+                flat_mat[i * shape.cols + ii] = lhs.at(i,ii) * rhs;
+            }
+        };
+         return Matrix<T>(flat_mat,shape.rows,shape.cols);
+    };
+    template<typename T,typename Scalar>
+    Matrix<T> operator*(Matrix<T> const &lhs,const Scalar &rhs){
+        return scalarMultiply(lhs,rhs);
+    }
+    template<typename T,typename Scalar>
+    Matrix<T> operator*(const Scalar &lhs,Matrix<T> const &rhs){
+        return scalarMultiply(rhs,lhs);
+    }
+
+        /*
+    applies dot product matrix matrix multiplication
+    see:https://en.wikipedia.org/wiki/Dot_product
+    */
+   template <typename T>
+    Matrix<T> dotProduct(Matrix<T> const  &lhs,Matrix<T> const  &rhs){
+
+        Shape lhs_shape = lhs.getShape();
+        Shape rhs_shape = rhs.getShape();
+
+        if (lhs_shape.cols != rhs_shape.rows) {
+            throw std::runtime_error("Shape mismatch: lhs is " +lhs_shape.shape_to_string() + ", rhs is " + rhs_shape.shape_to_string());
+        }
+
+        std::vector<T> flat_mat(lhs_shape.rows * rhs_shape.cols);
+
+       for(int m1_row = 0; m1_row < lhs_shape.rows;m1_row++){
+        for(int m2_col = 0; m2_col < rhs_shape.cols; m2_col++){
+            T sum = 0;
+            for(int m1_col = 0; m1_col< lhs_shape.cols; m1_col++){
+                sum += lhs.at(m1_row,m1_col) * rhs.at(m1_col,m2_col);
+            }
+            flat_mat[m1_row * rhs_shape.rows + m2_col] = sum;
+        }
+    }
+    return Matrix<T>(flat_mat,lhs_shape.rows,rhs_shape.cols);
+    };
+    template <typename T>
+    Matrix<T> operator*(const Matrix<T> &lhs,const Matrix<T> &rhs) {
+        return dotProduct(lhs,rhs);
     }
 };   
