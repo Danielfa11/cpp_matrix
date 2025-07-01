@@ -42,6 +42,10 @@ namespace MatrixOperations {
         }
         return Matrix<T> (flat_mat,shape.cols,shape.rows);
     };
+     template<typename T>
+       Matrix<T> operator~(Matrix<T> const &rhs) {
+        return getTranspose(rhs);
+    }
 
       /*
     compairs the matrixs to its transpoed matrix 
@@ -80,7 +84,7 @@ namespace MatrixOperations {
     };
 
     template <typename T, typename UnaryFunction>
-    Matrix<T> apply(Matrix<T> matrix,UnaryFunction func) {
+    Matrix<T> apply(const Matrix<T> &matrix,UnaryFunction func) {
         Shape shape = matrix.getShape();
         // Matrix<T> result(shape.rows, shape.cols);
         std::vector<T> flat_mat(shape.rows * shape.cols);
@@ -94,10 +98,10 @@ namespace MatrixOperations {
 
     template<typename T>
     Matrix<T> hadamardProduct(const Matrix<T> &lhs,const Matrix<T> &rhs) {
-        lhs.checkShapeMatch(rhs);
+        lhs.checkShapeMatch(rhs,"hadamard product");
         Shape shape =lhs.getShape();
+        
         std::vector<T> flat_mat(shape.rows * shape.cols);
-
         for(int i = 0; i < shape.rows; i++){
             for(int ii = 0; ii < shape.cols; ii++){
                 flat_mat[i * shape.cols + ii] = lhs.at(i,ii) * rhs.at(i,ii);
@@ -108,7 +112,7 @@ namespace MatrixOperations {
 
     template<typename T>
     Matrix<T> add(Matrix<T>const &lhs ,Matrix<T> const &rhs) {
-        lhs.checkShapeMatch(rhs);
+        lhs.checkShapeMatch(rhs, "add");
         Shape shape = lhs.getShape();
         std::vector<T> flat_mat(shape.rows * shape.cols);
 
@@ -120,13 +124,13 @@ namespace MatrixOperations {
         return Matrix<T>(flat_mat,shape.rows,shape.cols);
     };
     template<typename T>
-       Matrix<T> operator+(const Matrix<T> &lhs,const Matrix<T> &rhs) {
+       Matrix<T> operator+( Matrix<T> const &lhs, Matrix<T> const &rhs) {
         return add(lhs,rhs);
     }
 
     template<typename T>
     Matrix<T> subtract(Matrix<T> const &lhs,Matrix<T> const &rhs) {
-        lhs.checkShapeMatch(rhs);
+        lhs.checkShapeMatch(rhs,"subtract");
         Shape shape = lhs.getShape();
         std::vector<T> flat_mat(shape.rows * shape.cols);
         
@@ -138,7 +142,7 @@ namespace MatrixOperations {
         return Matrix<T>(flat_mat,shape.rows,shape.cols);
     };
     template<typename T>
-     Matrix<T> operator-(const Matrix<T> &lhs,const Matrix<T> &rhs){
+     Matrix<T> operator-( Matrix<T> const &lhs, Matrix<T> const &rhs){
         return subtract(lhs,rhs);
     }
 
@@ -159,11 +163,11 @@ namespace MatrixOperations {
          return Matrix<T>(flat_mat,shape.rows,shape.cols);
     };
     template<typename T,typename Scalar>
-    Matrix<T> operator*(Matrix<T> const &lhs,const Scalar &rhs){
+    Matrix<T> operator*(Matrix<T> const &lhs, Scalar const &rhs){
         return scalarMultiply(lhs,rhs);
     }
     template<typename T,typename Scalar>
-    Matrix<T> operator*(const Scalar &lhs,Matrix<T> const &rhs){
+    Matrix<T> operator*( Scalar const &lhs,Matrix<T> const &rhs){
         return scalarMultiply(rhs,lhs);
     }
 
@@ -173,29 +177,57 @@ namespace MatrixOperations {
     */
    template <typename T>
     Matrix<T> dotProduct(Matrix<T> const  &lhs,Matrix<T> const  &rhs){
-
         Shape lhs_shape = lhs.getShape();
-        Shape rhs_shape = rhs.getShape();
-
+        Shape rhs_shape = rhs.getShape();  
         if (lhs_shape.cols != rhs_shape.rows) {
-            throw std::runtime_error("Shape mismatch: lhs is " +lhs_shape.shape_to_string() + ", rhs is " + rhs_shape.shape_to_string());
+            throw std::runtime_error("Shape mismatch: lhs is " +lhs_shape.shape_to_string() + ", rhs is " + rhs_shape.shape_to_string() + " in dot product");
         }
-
-        std::vector<T> flat_mat(lhs_shape.rows * rhs_shape.cols);
-
+       std::vector<T> flat_mat(lhs_shape.rows * rhs_shape.cols);
+        int count = 0;
        for(int m1_row = 0; m1_row < lhs_shape.rows;m1_row++){
         for(int m2_col = 0; m2_col < rhs_shape.cols; m2_col++){
             T sum = 0;
             for(int m1_col = 0; m1_col< lhs_shape.cols; m1_col++){
                 sum += lhs.at(m1_row,m1_col) * rhs.at(m1_col,m2_col);
             }
-            flat_mat[m1_row * rhs_shape.rows + m2_col] = sum;
+
+            flat_mat[m1_row * rhs_shape.cols + m2_col] = sum;
+
         }
     }
     return Matrix<T>(flat_mat,lhs_shape.rows,rhs_shape.cols);
     };
     template <typename T>
-    Matrix<T> operator*(const Matrix<T> &lhs,const Matrix<T> &rhs) {
+    Matrix<T> operator*(const Matrix<T>  &lhs, const Matrix<T>  &rhs) {
         return dotProduct(lhs,rhs);
+    }
+
+    template <typename T>
+    Matrix<T> broadcastAddRows(const Matrix<T>  &lhs, const Matrix<T>  &rhs) {
+        Shape lhs_shape = lhs.getShape();
+        Shape rhs_shape = rhs.getShape(); 
+        if (rhs_shape.cols != 1 || rhs_shape.cols != lhs_shape.cols)
+            throw std::runtime_error("Bias row must be shape 1 × cols of matrix");
+        std::vector<T> flat_mat(lhs_shape.rows * lhs_shape.cols);
+        
+        for (int i = 0; i < lhs_shape.rows; ++i) {
+            for (int ii = 0; ii < lhs_shape.cols; ++ii) {
+                flat_mat[i * rhs_shape.cols + ii] = lhs.at(i,ii) + rhs.at(i,0);
+            }
+        }
+        return Matrix<T>(flat_mat,lhs_shape.rows,lhs_shape.cols);
+    }
+
+    template <typename T>
+    Matrix<T> rowWiseSum(const Matrix<T>& mat) {
+        Shape shape = mat.getShape();
+        std::vector<T> result(shape.rows, 0);
+        for(int i = 0; i<shape.rows;i++){
+            for(int ii =0;ii<shape.cols;ii++){
+                result[i] += mat.at(i,ii);
+            }
+        }
+        
+        return Matrix<T>(result, shape.rows,1); // 1 row, N columns
     }
 };   

@@ -17,6 +17,55 @@ TEST_CASE("Matrix creation and shape", "[Matrix]") {
     CHECK(mat2.at(1, 2) == 6.0);
 };
 
+
+
+TEST_CASE("Matrix addition in place","[Matrix]"){
+    Matrix<int> mat1({1,2,3,4,5,6},2,3);
+    Matrix<int> mat2({1,2,3,4,5,6},2,3);
+    Matrix<int> expected({2,4,6,8,10,12},2,3);
+    mat1+=mat2;
+    CHECK(mat1 == expected);
+    Matrix<int> throws(4,4);
+    CHECK_THROWS_AS(mat1+=throws, std::runtime_error);
+};
+TEST_CASE("Matrix subtaction in place","[Matrix]"){
+    Matrix<int> mat1({2,4,6,8,10,12},2,3);
+    Matrix<int> mat2({1,2,3,4,5,6},2,3);
+    Matrix<int> expected({1,2,3,4,5,6},2,3);
+    
+    mat1-=mat2;
+    CHECK(mat1 == expected);
+    Matrix<int> throws(4,4);
+    CHECK_THROWS_AS(mat1-=throws, std::runtime_error);
+};
+
+TEST_CASE("Matrix scalar in place","[Matrix]"){
+    Matrix<int> mat1({1,2,3,4,5,6},2,3);
+    int scalar = 3;
+    Matrix<int> expected({3,6,9,12,15,18},2,3);
+    
+    mat1*=scalar;
+    CHECK(mat1 == expected);
+    Matrix<int> throws(4,4);
+    CHECK_THROWS_AS(mat1-=throws, std::runtime_error);
+};
+
+// THIS ABILITY IS ON HOLD until futher thought
+// TEST_CASE("Matrix dotProduct in place", "[MatrixOps]") {
+//     Matrix<double> a({1, 2, 3, 4}, 2, 2);
+//     Matrix<double> b({5, 6, 7, 8}, 2, 2);
+//     Matrix<double> expected({19, 22, 43, 50}, 2, 2);
+//     a.print();
+//     a*=b;
+
+//     a.print();
+//     CHECK(a == expected);
+
+//     Matrix<double> bad({1, 2, 3, 4, 5, 6}, 3, 2);
+//     CHECK_THROWS_AS(dotProduct(a, bad), std::runtime_error);
+// }
+
+
 TEST_CASE("isSquareMatrix", "[MatrixOps]") {
     Matrix<double> square({1, 2, 3, 4}, 2, 2);
     Matrix<double> nonSquare({1, 2, 3, 4, 5, 6}, 2, 3);
@@ -98,9 +147,15 @@ TEST_CASE("dotProduct", "[MatrixOps]") {
     Matrix<double> b({5, 6, 7, 8}, 2, 2);
     Matrix<double> expected({19, 22, 43, 50}, 2, 2);
 
+    
     CHECK(dotProduct(a, b) == expected);
     CHECK((a * b) == expected);
 
+    Matrix<double> c({1,2,3,4,5,6},3,2);
+    Matrix<double> d({1,2,3,4},2,2);
+    Matrix<double>expected2({7,10,15,22,23,34},3,2);
+    CHECK(dotProduct(c,d) == expected2);
+    
     Matrix<double> bad({1, 2, 3, 4, 5, 6}, 3, 2);
     CHECK_THROWS_AS(dotProduct(a, bad), std::runtime_error);
 }
