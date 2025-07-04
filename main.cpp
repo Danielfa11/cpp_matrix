@@ -1,5 +1,5 @@
-#include "NueralNet/FF_NNet.hpp"
-#include "readFile/readTxtFile.hpp"
+#include "src/NueralNet/FF_NNet.hpp"
+#include "src/readFile/readTxtFile.hpp"
 // #include "matrix/matrix.hpp"
 // #include "matrix/matrixOperations.hpp"
 
