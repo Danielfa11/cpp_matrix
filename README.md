@@ -12,5 +12,5 @@ To Run:
     - `./bin/MODELS_LIB` or `./MODELS_LIB` when in bin
 
 
-attempted change to fail
+attempted change to fail try 2
 No unit test for unit test libray have been implemented yet
