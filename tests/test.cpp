@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "../matrix/matrix.hpp"
-#include "../matrix/matrixOperations.hpp"
+#include "../src/matrix/matrix.hpp"
+#include "../src/matrix/matrixOperations.hpp"
 
 using namespace MatrixOperations;
 
