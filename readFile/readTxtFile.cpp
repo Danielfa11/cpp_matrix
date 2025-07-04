@@ -20,8 +20,7 @@ void readTxtFile::read(char delim) {
     std::cout << "from readTxtFile" << std::endl;
     char fileData [785];
     if(this->ifs.is_open()){
-        ifs.
-        .getline(fileData,785);
+        ifs.getline(fileData,785);
         // std::cout << fileData << std::endl;
         std::cout <<ifs.width()<< "\n" ;
         std::cout << (int)delim << std::endl;

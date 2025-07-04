@@ -1,6 +1,7 @@
 #include "../matrix/matrix.hpp"
 #include "../matrix/matrixOperations.hpp"
 #include <functional>
+#include <algorithm>
 
 class FF_NNet{
     using Func = std::function<Matrix<double>(const Matrix<double>&)>;
