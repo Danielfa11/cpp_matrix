@@ -171,6 +171,25 @@ namespace MatrixOperations {
         return scalarMultiply(rhs,lhs);
     }
 
+    template<typename T, typename Scalar>
+    Matrix<T> scalarDivide(Matrix<T> const &lhs,const Scalar &rhs) {
+        Shape shape = lhs.getShape();
+        std::vector<T> flat_mat(shape.rows * shape.cols);
+        if (rhs == 0) {
+            throw std::runtime_error("cant divide by zero");
+        }
+        for(int i = 0; i < shape.rows; i++){
+            for(int ii = 0; ii < shape.cols; ii++){
+                flat_mat[i * shape.cols + ii] = lhs.at(i,ii) / rhs;
+            }
+        };
+         return Matrix<T>(flat_mat,shape.rows,shape.cols);
+    };
+    template<typename T,typename Scalar>
+    Matrix<T> operator/(Matrix<T> const &lhs, Scalar const &rhs){
+        return scalarDivide(lhs,rhs);
+    }
+
         /*
     applies dot product matrix matrix multiplication
     see:https://en.wikipedia.org/wiki/Dot_product
@@ -203,31 +222,34 @@ namespace MatrixOperations {
     }
 
     template <typename T>
-    Matrix<T> broadcastAddRows(const Matrix<T>  &lhs, const Matrix<T>  &rhs) {
+    Matrix<T> broadcastAddRows(const Matrix<T>  &lhs, const Matrix<T>  &bias) {
         Shape lhs_shape = lhs.getShape();
-        Shape rhs_shape = rhs.getShape(); 
-        if (rhs_shape.cols != 1 || rhs_shape.cols != lhs_shape.cols)
-            throw std::runtime_error("Bias row must be shape 1 × cols of matrix");
+        Shape bias_shape = bias.getShape(); 
+        if (bias_shape.rows != 1 || bias_shape.cols != lhs_shape.cols)
+            throw std::runtime_error("Bias must be shape 1 × cols, had :"+ bias_shape.shape_to_string() + " and addition with " + lhs_shape.shape_to_string());
         std::vector<T> flat_mat(lhs_shape.rows * lhs_shape.cols);
         
+        /*
+          1 2 3    2x4 need 1x4
+          4 4 6 +
+        */
         for (int i = 0; i < lhs_shape.rows; ++i) {
             for (int ii = 0; ii < lhs_shape.cols; ++ii) {
-                flat_mat[i * rhs_shape.cols + ii] = lhs.at(i,ii) + rhs.at(i,0);
+                flat_mat[i * bias_shape.cols + ii] = lhs.at(i,ii) + bias.at(0,ii);
             }
         }
         return Matrix<T>(flat_mat,lhs_shape.rows,lhs_shape.cols);
     }
 
     template <typename T>
-    Matrix<T> rowWiseSum(const Matrix<T>& mat) {
+    Matrix<T> colsSum(const Matrix<T>& mat) {
         Shape shape = mat.getShape();
-        std::vector<T> result(shape.rows, 0);
-        for(int i = 0; i<shape.rows;i++){
-            for(int ii =0;ii<shape.cols;ii++){
-                result[i] += mat.at(i,ii);
+        std::vector<T> result(shape.cols, 0);
+        for(int i = 0; i<shape.cols;i++){
+            for(int ii =0;ii<shape.rows;ii++){
+                result[i] += mat.at(ii,i);
             }
         }
-        
-        return Matrix<T>(result, shape.rows,1); // 1 row, N columns
+        return Matrix<T>(result, 1, shape.cols); // 1 row, N columns
     }
 };   

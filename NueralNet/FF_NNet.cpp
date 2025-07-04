@@ -29,31 +29,46 @@ double MSE(const double &x){
         std::uniform_real_distribution<> dist(-1, 1);
 
         for(int i = 1; i <layers.size();i++){
-            int input_size = layers[i];
-            int output_size = layers[i - 1];
+            int input_size = layers[i-1];
+            int output_size = layers[i];
 
             std::vector<double> weight;
             std::vector<double> bias;
-            for(int ii = 0; ii < input_size*output_size; ii++){ 
+            //                  input       output
+            for(int ii = 0; ii < layers[i-1]*layers[i]; ii++){ 
                 weight.push_back(dist(e2));
             }
-            for(int ii = 0; ii < input_size;ii++){
+            //                  
+            for(int ii = 0; ii < layers[i];ii++){
                 bias.push_back(dist(e2));
             }
-            weights.push_back(Matrix<double>(weight, output_size, input_size));
-            biases.push_back(Matrix<double>(bias, 1, input_size));
+            weights.push_back(Matrix<double>(weight,layers[i-1], layers[i]));
+            biases.push_back(Matrix<double>(bias,1,layers[i]));
         }
     };
 
-    void FF_NNet::train(const Matrix<double> &input,const Matrix<double> &target){
-        fowardPass(input,target);
+    Matrix<double> FF_NNet::train(const Matrix<double> &input,const Matrix<double> &target){
+        return fowardPass(input,target);
     };
 
-    void FF_NNet::predict(const Matrix<double> &input){};
+    Matrix<double> FF_NNet::predict(const Matrix<double> &inputs){
+        std::vector<Matrix<double>> activations;
+        std::vector<Matrix<double>> z_values;
+        activations.push_back(inputs);
+
+        for(int i = 0; i< weights.size();i++){
+            Matrix<double> z = broadcastAddRows(activations[i] * weights[i],biases[i]);
+            z_values.push_back(z);
+            activations.push_back(apply(z,sigmoid));    
+        }
+
+        return activations[activations.size()-1];
+    };
 
     void FF_NNet::print(){
+        std::cout << "nn weight and bias" << std::endl;
         for(int i =0; i < weights.size();i++){
-            std::cout << "wieghts"<<i<<" \n";
+            std::cout << "wieghts_"<<i<<" \n";
             weights[i].print();
             std::cout << "\n";
         };
@@ -66,14 +81,13 @@ double MSE(const double &x){
 
     };
     
-    void FF_NNet::fowardPass(const Matrix<double> &inputs, const Matrix<double> &target){
+    Matrix<double> FF_NNet::fowardPass(const Matrix<double> &inputs, const Matrix<double> &target){
         // foward Pass
         std::vector<Matrix<double>> activations;
         std::vector<Matrix<double>> z_values;
         activations.push_back(inputs);
-
         for(int i = 0; i< weights.size();i++){
-            Matrix<double> z = broadcastAddRows(weights[i] * activations[i],biases[i]);
+            Matrix<double> z = broadcastAddRows(activations[i] * weights[i],biases[i]);
             z_values.push_back(z);
             activations.push_back(apply(z,sigmoid));    
         }
@@ -94,7 +108,7 @@ double MSE(const double &x){
         for (int i = weights.size() - 2; i >= 0; --i) {
             // weight^T * last delta, for each row
             Matrix<double> delta_prev = hadamardProduct(
-                 ~weights[i + 1] * deltas.back(),
+                deltas.back() * ~weights[i + 1],
                 apply(z_values[i], sigmoid_prime)
             );
             deltas.push_back(delta_prev); 
@@ -109,21 +123,15 @@ double MSE(const double &x){
             Matrix<double> a_prev = activations[i];
             Matrix<double> delta = deltas[i];
             // calculate gradiant for weights 
-            std::cout << "delta"<<i << std::endl;
-            delta.print();
-            std::cout << std::endl;
-            Matrix<double> grad_w = delta * ~a_prev ;
-        
-            Matrix<double> grad_b = rowWiseSum(delta);
-
+            Matrix<double> grad_w =  ~a_prev * delta;
+            
+            Matrix<double> grad_b = colsSum(delta);
+            
             // Update the weights and biases
-            std::cout << "gradw"<<i << std::endl;
-            grad_w.print();
-            std::cout << std::endl;
             weights[i] = weights[i] - grad_w * learnRate;
             biases[i] = biases[i] - grad_b * learnRate;
-        }
-        //TODO think placing some type of output down here???        
+        }    
+        return error;
     };
 
     void FF_NNet::backwardPass(){};

@@ -1,4 +1,5 @@
 #include "NueralNet/FF_NNet.hpp"
+#include "readFile/readTxtFile.hpp"
 // #include "matrix/matrix.hpp"
 // #include "matrix/matrixOperations.hpp"
 
@@ -6,79 +7,78 @@
 #include <functional>
 #include <cmath>
 
-// using namespace MatrixOperations;
+
+#include <iostream>
+#include <vector>
+
+using namespace MatrixOperations;
 
 int main() { 
-    // w1 - 2x2 b1 - 1x2
-    // w2 - 1x2 b2 - 1x1
-   Matrix<double> X({1, 0}, 2, 1);
 
-    // Hidden layer weights (2x2) and biases (2x1)
-    Matrix<double> W1({
-        1, 1,
-        0.5, -0.5
-    }, 2, 2);
+    readTxtFile readFile("MNIST_txt/MNIST_test.txt");
+    readFile.read(',');
+    readFile.read(',');
+    // std::cout << charText.size() << std::endl;
+    // std::string line;
+    // std::ifstream ifs("MNIST_txt/MNIST_train.txt");
 
-    Matrix<double> b1({0.5, 0}, 2, 1);
+    // std::vector<double> inputs;
+    // std::vector<double> targets;
+    // std::vector<double> predict;
+    // int count = 0;
+    // if (ifs.is_open()){
+    //    while( getline (ifs, line)){
+    //     if (count == 50){
+    //         break;
+    //     }
+    //     count++;
+        
+    //     int classificaion = line.at(0);
+    //     for(int i =0; i < 9; i++){
+    //         if(classificaion - '0' == i){
+    //             targets.push_back(1);
+    //         }else{
+    //             targets.push_back(0);
+    //         }
+    //     }
+    //     line.erase(0,2);
 
-    // Output layer weights (1x2) and bias (1x1)
-    Matrix<double> W2({1, 1}, 1, 2);
-    Matrix<double> b2({0.5}, 1, 1);
+    //     std::stringstream ss(line);
+    //     std::string token;
+    //     while (getline(ss, token, ',')) {
+    //         inputs.push_back(std::stod(token));
+    //         if(count == 2){
+    //             predict.push_back(std::stod(token));
+    //         }
+    //         }
+    //     }
+    //     std::cout << count << std::endl;
+    //     ifs.close();
+    // };
 
-    std::vector<Matrix<double>> weights = {W1,W2};
-    std::vector<Matrix<double>> biases = {b1,b2};
-    FF_NNet test = FF_NNet({2,2,1},
-                      biases,
-                      weights);
+    // std::cout << targets.size() << std::endl;
+    // Matrix<double> M_i(inputs,count,784);
+    // Matrix<double>T_i (targets,count,9);
+    // FF_NNet MNIST_num({784,1000,1000,9});
 
-    Matrix<double> target({1.0}, 1, 1);
-    test.train(X,target);
-    test.print();
-    // Matrix<double> in({ 1,2,3,
-    //                     4,5,6,
-    //                     7,8,9,
-    //                     10,11,12,
-    //                     13,14,15},5,3);
+    // Matrix<double> m_i2 = M_i / 255.0;
+    // for(int i = 0; i <10; i++){
+    //     Matrix<double> error =MNIST_num.train(m_i2,T_i);
+    //     // if (i % 3 == 0){
+    //         Shape error_shape = error.getShape();
+    //         double errorSum = 0;
+    //         for(int ii = 0; ii < error_shape.rows; ii++){
+    //             for(int iii = 0; iii< error_shape.cols;iii++ ){
+    //                 errorSum += error.at(ii,iii);
+    //             }
+                
+    //         }
+    //         std::cout << "\nTotal error for round: "<< i<<"\n"<< errorSum << std::endl;
+    // }
 
-    // myNet.train(in,Matrix<double>({1,
-    //                                1,
-    //                                0,
-    //                                1,
-    //                                0},5,1));
-    // Matrix<double> input({0,1,1},1,3);
-    // Matrix<double> weight({0.351,-0.097,0.457,
-    //                        1.076,-0.165,-0.165,
-    //                        1.116,0.542,-0.331},3,3);
+    // MNIST_num.predict((Matrix<double>(
+    //     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,84,185,159,151,60,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,222,254,254,254,254,241,198,198,198,198,198,198,198,198,170,52,0,0,0,0,0,0,0,0,0,0,0,0,67,114,72,114,163,227,254,225,254,254,254,250,229,254,254,140,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,66,14,67,67,67,59,21,236,254,106,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,253,209,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,233,255,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,129,254,238,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,249,254,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,133,254,187,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,205,248,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,126,254,182,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,251,240,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,221,254,166,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,203,254,219,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,38,254,254,77,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,224,254,115,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,133,254,254,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,61,242,254,254,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,121,254,254,219,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,121,254,207,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    //     ,1,784) /255 )).print();
 
-    // Matrix<double> h1 =apply((input * weight),sigmoid);
-
-    // Matrix<double>weight2({0.383,
-    //                       -0.327,
-    //                       -0.329},3,1);
-    // h1.print();
-    // std::cout << "\n";
-    // apply((h1 * weight2),sigmoid).print();
     return 0;
 }
-
-
-// double sigmoid(const double &x) {
-//     return 1.0 / (1.0 + std::exp(-x));
-// }
-
-// double sigmoid_prime(double &x){
-//     double sig_value = sigmoid(x);
-//     return  sig_value * (1 - sig_value);
-// }
-
-// double reLU(const double &x) {
-//     if (x <= 0) return 0;
-//     return x;
-// }
-
-// bool check(const double &x){
-//     if(x > 0){
-//         return 1;
-//     }
-//     return 0;
-// }

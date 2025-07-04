@@ -17,15 +17,15 @@ class FF_NNet{
                       const std::vector<Matrix<double>> bias,
                       const std::vector<Matrix<double>> weights);
 
-    void train(const Matrix<double> &input,const Matrix<double> &target);
+    Matrix<double> train(const Matrix<double> &input,const Matrix<double> &target);
 
-    void predict(const Matrix<double> &input);
+    Matrix<double> predict(const Matrix<double> &inputs);
 
     void print();
     
 
     private:
-    void fowardPass(const Matrix<double> &input, const Matrix<double> &target);
+    Matrix<double> fowardPass(const Matrix<double> &input, const Matrix<double> &target);
 
     void backwardPass();
 

@@ -17,7 +17,9 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(MODELS_LIB 
               main.cpp
-              NueralNet/FF_NNet.cpp)
+              NueralNet/FF_NNet.cpp
+              readFile/readTxtFile.cpp
+              )
 set_target_properties(MODELS_LIB PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 add_executable(testRun UNIT_TESTS/test.cpp)

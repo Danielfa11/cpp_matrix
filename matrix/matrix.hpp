@@ -45,7 +45,7 @@ class Matrix {
             for(int ii = 0;ii< shape_.cols;ii++){
                 std::cout << matrix_[i * shape_.cols + ii] << " ";
             }
-            std::cout << "\n";
+            std::cout << "\n\n";
         }
     }
     
