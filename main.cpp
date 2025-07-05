@@ -1,24 +1,23 @@
-#include "src/NueralNet/FF_NNet.hpp"
-#include "src/readFile/readTxtFile.hpp"
-// #include "matrix/matrix.hpp"
-// #include "matrix/matrixOperations.hpp"
 
+#include <iostream>
 #include <iostream>
 #include <functional>
 #include <cmath>
-
-
-#include <iostream>
 #include <vector>
+
+#include <fstream>
+#include <sstream>
+#include <string>
+
+#include "src/NueralNet/FF_NNet.hpp"
+// #include "src/matrix/matrix.hpp"
+// #include "src/matrix/matrixOperations.hpp"
+
 
 using namespace MatrixOperations;
 
 int main() { 
 
-    readTxtFile readFile("MNIST_txt/MNIST_test.txt");
-    readFile.read(',');
-    readFile.read(',');
-    // std::cout << charText.size() << std::endl;
     // std::string line;
     // std::ifstream ifs("MNIST_txt/MNIST_train.txt");
 
@@ -44,7 +43,7 @@ int main() {
     //     line.erase(0,2);
 
     //     std::stringstream ss(line);
-    //     std::string token;
+        // std::string token;
     //     while (getline(ss, token, ',')) {
     //         inputs.push_back(std::stod(token));
     //         if(count == 2){
@@ -59,19 +58,20 @@ int main() {
     // std::cout << targets.size() << std::endl;
     // Matrix<double> M_i(inputs,count,784);
     // Matrix<double>T_i (targets,count,9);
-    // FF_NNet MNIST_num({784,1000,1000,9});
 
+    FF_NNet MNIST_num({10,5,5,3,9}); // {784,1000,1000,9}
+    // MNIST_num.print();
+    MNIST_num.saveToFile();
     // Matrix<double> m_i2 = M_i / 255.0;
+    
     // for(int i = 0; i <10; i++){
     //     Matrix<double> error =MNIST_num.train(m_i2,T_i);
-    //     // if (i % 3 == 0){
     //         Shape error_shape = error.getShape();
     //         double errorSum = 0;
     //         for(int ii = 0; ii < error_shape.rows; ii++){
     //             for(int iii = 0; iii< error_shape.cols;iii++ ){
     //                 errorSum += error.at(ii,iii);
-    //             }
-                
+    //             }  
     //         }
     //         std::cout << "\nTotal error for round: "<< i<<"\n"<< errorSum << std::endl;
     // }

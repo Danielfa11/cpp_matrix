@@ -22,6 +22,6 @@ add_executable(MODELS_LIB
               )
 set_target_properties(MODELS_LIB PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-add_executable(testRun tests/test.cpp)
+add_executable(testRun tests/matrix_test.cpp)
 target_link_libraries(testRun PRIVATE Catch2::Catch2WithMain)
 set_target_properties(testRun PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

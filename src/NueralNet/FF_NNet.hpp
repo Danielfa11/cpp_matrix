@@ -1,7 +1,14 @@
-#include "../matrix/matrix.hpp"
-#include "../matrix/matrixOperations.hpp"
+#ifndef MODELS_SRC_NUERALNET_FF_NNENT_H
+#define MODELS_SRC_NUERALNET_FF_NNENT_H
+
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <functional>
 #include <algorithm>
+
+#include "../matrix/matrix.hpp"
+#include "../matrix/matrixOperations.hpp"
 
 class FF_NNet{
     using Func = std::function<Matrix<double>(const Matrix<double>&)>;
@@ -24,6 +31,7 @@ class FF_NNet{
 
     void print();
     
+    void saveToFile();
 
     private:
     Matrix<double> fowardPass(const Matrix<double> &input, const Matrix<double> &target);
@@ -31,3 +39,5 @@ class FF_NNet{
     void backwardPass();
 
 };
+
+#endif // MODELS_SRC_NUERALNET_FF_NNENT_H

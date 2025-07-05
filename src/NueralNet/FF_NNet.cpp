@@ -29,9 +29,6 @@ double MSE(const double &x){
         std::uniform_real_distribution<> dist(-1, 1);
 
         for(int i = 1; i <layers.size();i++){
-            int input_size = layers[i-1];
-            int output_size = layers[i];
-
             std::vector<double> weight;
             std::vector<double> bias;
             //                  input       output
@@ -133,5 +130,54 @@ double MSE(const double &x){
         }    
         return error;
     };
+    /*
+    The file will be save in the formate with new line being a seperator
+    
+    layers
+    W\t ...
+    B\t ...
+    */
+    void FF_NNet::saveToFile(){
+       std::string filesName = "saved_Models/ff_net.txt";
+       std::ofstream ofs(filesName,std::ofstream::out);
+       int layers = this->weights.size();
+       Shape* weightSizes = new Shape[layers];
+       Shape* biasSizes = new Shape[layers];
 
+        for(int i = 0; i< layers; i++){
+            weightSizes[i] = weights[i].getShape();
+            ofs << weightSizes[i].rows << ",";
+            if(i+1 == layers){
+                ofs << weightSizes[i].cols << "\n";
+            }
+        }
+
+        for(int i=0;i< layers;i++){
+            Matrix<double> currW = weights[i];
+            Matrix<double> currB = biases[i];
+
+            std::vector<double> flatW = currW.getFlat();
+            std::vector<double> flatB = currB.getFlat();
+
+            ofs << "W\t";
+            for (int ii = 0; ii < flatW.size(); ii++){
+                ofs << flatW[ii] << ",";
+            }
+            ofs << "\n";
+
+            ofs << "B\t";
+            for(int ii = 0; ii < flatB.size(); ii++){
+                ofs << flatB[ii] << ",";
+            };
+            ofs << "\n";
+        };
+
+        delete[] weightSizes;
+        weightSizes = nullptr;
+        delete[] biasSizes;
+        biasSizes = nullptr;
+       ofs.close();
+
+
+    }
     void FF_NNet::backwardPass(){};
