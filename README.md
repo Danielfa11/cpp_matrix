@@ -14,3 +14,10 @@ To Run:
 
 attempted change to fail try 2
 No unit test for unit test libray have been implemented yet
+
+
+When to test for memory leaks some options are:
+ - valgrind - for linux systems
+ - leaks - for macOS from XCode
+   use: `leaks --atExit --list -- EXACUTABLE`
+

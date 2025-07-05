@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MODELS_LIB_SRC_MATRIX_MATRIX_H
+#define MODELS_LIB_SRC_MATRIX_MATRIX_H
+
 #include <vector>
 #include <iostream>
 #include <utility>
@@ -38,6 +40,10 @@ class Matrix {
 
     Shape getShape() const{
         return shape_; 
+    }
+
+    const std::vector<T>& getFlat(){
+        return matrix_;
     }
 
     void print() const{
@@ -148,3 +154,4 @@ class Matrix {
 
 
 };
+#endif // MODELS_LIB_SRC_MATRIX_MATRIX_H

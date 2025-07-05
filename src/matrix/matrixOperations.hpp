@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MODELS_MATRIX_OPERATIONS_H
+#define MODELS_MATRIX_OPERATIONS_H
+
 #include "matrix.hpp"
 
 
@@ -253,3 +255,5 @@ namespace MatrixOperations {
         return Matrix<T>(result, 1, shape.cols); // 1 row, N columns
     }
 };   
+
+#endif // MODELS_MATRIX_OPERATIONS
