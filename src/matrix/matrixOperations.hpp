@@ -193,7 +193,7 @@ namespace MatrixOperations {
     }
 
         /*
-    applies dot product matrix matrix multiplication
+    Performs matrix multiplication
     see:https://en.wikipedia.org/wiki/Dot_product
     */
    template <typename T>
