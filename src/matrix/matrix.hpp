@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <random>
+#include <iomanip>
 
 
 struct Shape {
@@ -49,7 +50,7 @@ class Matrix {
     void print() const{
         for(int i =0; i< shape_.rows;i++){
             for(int ii = 0;ii< shape_.cols;ii++){
-                std::cout << matrix_[i * shape_.cols + ii] << " ";
+                std::cout << std::setprecision(3) <<matrix_[i * shape_.cols + ii] << " ";
             }
             std::cout << "\n\n";
         }
@@ -77,23 +78,11 @@ class Matrix {
          return matrix_[row * shape_.cols + col];
     }
 
-    void broadcastAddRows(const Matrix<T>& bias_row) {
-        auto bias_pair = bias_row.getShape();
-        if (bias_pair.first != 1 || bias_pair.second != shape_.cols)
-            throw std::runtime_error("Bias row must be shape 1 × cols of matrix");
-
-        for (int i = 0; i < shape_.rows; ++i) {
-            for (int ii = 0; ii < shape_.cols; ++ii) {
-                this->at(i,ii) += bias_row.at(0,ii);
-            }
-        }
-    }
-
     /*
     compairs the matrixs element wise where differance bewteen 
     value must be with in 0.000001
     */
-    bool isEqual(Matrix<T> const rhs) const{
+    bool isEqual(Matrix<T> const &rhs) const{
         auto shape = rhs.getShape();
         if (shape.rows != shape_.rows || shape.cols != shape_.cols) return false;
 
@@ -124,7 +113,6 @@ class Matrix {
 
     void subtract(Matrix<T> const &rhs) {
         checkShapeMatch(rhs, "subtract in place");
-        Matrix<T> result(shape_.rows,shape_.cols);
         for(int i = 0; i < shape_.rows; i++){
             for(int ii = 0; ii < shape_.cols; ii++){
                 this->at(i,ii) -= rhs.at(i,ii);
@@ -140,7 +128,6 @@ class Matrix {
     // */
     template<typename Scalar>
     void scalarMultiply(Scalar const &rhs) {
-        Matrix<T> result(shape_.rows,shape_.cols);
         for(int i = 0; i < shape_.rows; i++){
             for(int ii = 0; ii < shape_.cols; ii++){
                  this->at(i,ii) *= rhs;
