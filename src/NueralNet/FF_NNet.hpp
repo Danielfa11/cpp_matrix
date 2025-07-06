@@ -6,6 +6,8 @@
 #include <string>
 #include <functional>
 #include <algorithm>
+#include <iomanip>
+#include <stddef.h>
 
 #include "../matrix/matrix.hpp"
 #include "../matrix/matrixOperations.hpp"
@@ -25,6 +27,7 @@ class FF_NNet{
                       const std::vector<Matrix<double>> bias,
                       const std::vector<Matrix<double>> weights);
 
+
     Matrix<double> train(const Matrix<double> &input,const Matrix<double> &target);
 
     Matrix<double> predict(const Matrix<double> &inputs);
@@ -39,5 +42,7 @@ class FF_NNet{
     void backwardPass();
 
 };
+
+FF_NNet readFromFile(std::string path);
 
 #endif // MODELS_SRC_NUERALNET_FF_NNENT_H

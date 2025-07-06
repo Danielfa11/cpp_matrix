@@ -42,7 +42,7 @@ class Matrix {
         return shape_; 
     }
 
-    const std::vector<T>& getFlat(){
+    const std::vector<T>& getFlat() const{
         return matrix_;
     }
 
