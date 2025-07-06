@@ -59,9 +59,11 @@ int main() {
     // Matrix<double> M_i(inputs,count,784);
     // Matrix<double>T_i (targets,count,9);
 
-    FF_NNet MNIST_num({10,5,5,3,9}); // {784,1000,1000,9}
+    FF_NNet MNIST_num({10,5,3,9}); // {784,1000,1000,9}
     // MNIST_num.print();
-    MNIST_num.saveToFile();
+    // MNIST_num.saveToFile();
+
+    readFromFile("saved_Models/ff_net.txt").print();
     // Matrix<double> m_i2 = M_i / 255.0;
     
     // for(int i = 0; i <10; i++){
